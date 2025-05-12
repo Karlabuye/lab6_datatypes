@@ -82,8 +82,7 @@ ca_childcare <- ca_childcare |>
 
 ```{r}
 #| label: median-income-by-region-over-time
-# Hint: You will want to calculate the median of median income before you make columns for 2008/2018 by transforming the data
-
+#| message: false
 ca_childcare |>
   filter(study_year %in% c(2018, 2008)) |>#get the two study years wanted
   group_by(region, study_year) |> # to get the median balue for each year and region
@@ -100,6 +99,7 @@ ca_childcare |>
 
 ```{r}
 #| label: lowest-median-weekly-price-2018
+#| message: false
 
 ca_childcare |>
   filter(study_year == 2018) |>#get only 2018
@@ -117,20 +117,25 @@ The Superior California region has the lowest median full-time median weekly pri
 
 ```{r}
 #| label: recreate-plot
+#| message: false
 ca_childcare |>
-  pivot_longer(cols = c("mc_infant", "mc_toddler", "mc_preschool"), names_to= "level_edu", values_to= "wkmedian_price")|> #create the level of education, and median weekly price variables
-  mutate(
-    level_edu = factor(level_edu, levels = c("mc_infant", "mc_toddler", "mc_preschool")),
-    region = fct_reorder(region, mcsa, .na_rm = TRUE,.desc = TRUE))|>
+  pivot_longer(cols = c("mc_infant", "mc_toddler", "mc_preschool"), 
+               names_to= "level_edu", 
+               values_to= "wkmedian_price")|> #create the level of education, and median weekly price variables
+  mutate(level_edu = factor(level_edu, levels = c("mc_infant", "mc_toddler", "mc_preschool")),
+         region = fct_reorder(region, mcsa, .na_rm = TRUE,.desc = TRUE))|>
   ggplot(aes(x = study_year, y= wkmedian_price, color = region))+
   geom_point()+
   geom_smooth()+
   facet_wrap(~level_edu,
              labeller = labeller(level_edu = c(
-      mc_infant = "Infant",
-      mc_toddler = "Toddler",
-      mc_preschool = "Preschool")))+
-  labs(x= "Study Year", y = "", title = "Weekly Median Price for Center-Based Childcare ($)", color= "California Region")+
+               mc_infant = "Infant",
+               mc_toddler = "Toddler",
+               mc_preschool = "Preschool")))+
+  labs(x= "Study Year",
+       y = "",
+       title = "Weekly Median Price for Center-Based Childcare ($)",
+       color= "California Region")+
   scale_x_continuous(breaks = seq(2008, 2018, by = 2))+
   theme_bw()+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
